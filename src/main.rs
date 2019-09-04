@@ -12,7 +12,7 @@ use std::sync::{Arc, Mutex};
 use std::panic;
 
 fn main() {
-    rayon::ThreadPoolBuilder::new().num_threads(num_cpus::get()).build_global().unwrap();
+    rayon::ThreadPoolBuilder::new().num_threads(num_cpus::get() * 10).build_global().unwrap();
     panic::set_hook(Box::new(|_| {
         eprintln!("download failed...");
         remove_dir_all("ruget_tmp_dir");
@@ -34,6 +34,7 @@ fn main() {
 fn parallel_download(url: &str, thread_args: &mut Vec<(usize, String)>) {
     println!("--- Parallel download mode ---\n");
     println!("split count : {}", thread_args.len());
+    println!("parallel count : {}", num_cpus::get() * 10);
 
     let client = Client::new();
     let downloaded_count = Arc::new(Mutex::new(0.0));
