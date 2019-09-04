@@ -69,11 +69,17 @@ impl Download for ParallelDownloader {
         let total_count = thread_args.len() as f32;
         create_dir("ruget_tmp_dir").expect("create tmp dir failed...");
         thread_args.into_par_iter().for_each(|arg| {
-            let mut res = client
-                .get(&self.url)
-                .header(RANGE, format!("{}", arg.1))
-                .send()
-                .expect("request failed...");
+            let mut res = loop {
+                let res = client
+                    .get(&self.url)
+                    .header(RANGE, format!("{}", arg.1))
+                    .send();
+
+                match res {
+                    Ok(res) => break res,
+                    Err(_) => continue,
+                }
+            };
             let tmp = format!("ruget_tmp_dir/{}.tmp", arg.0);
             let mut file = File::create(tmp).unwrap();
             res.copy_to(&mut file).expect("create failed...");
