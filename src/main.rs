@@ -11,8 +11,8 @@ use lib::utils::{Download, get_content_length};
 
 fn main() {
     ThreadPoolBuilder::new()
-        .num_threads(num_cpus::get() * 2)
-        .stack_size(1000000)
+        .num_threads(num_cpus::get())
+//        .stack_size(1000000)
         .build_global()
         .unwrap();
     panic::set_hook(Box::new(|_| {
