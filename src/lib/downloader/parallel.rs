@@ -4,8 +4,9 @@ use reqwest::Client;
 use std::fs::{create_dir, remove_dir_all, File};
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::sync::{Arc, Mutex};
+use num_cpus;
 
-use crate::utils::*;
+use crate::lib::utils::{Download, get_content_length};
 
 pub struct ParallelDownloader {
     pub url: String,
@@ -42,6 +43,7 @@ impl ParallelDownloader {
     }
 
     pub fn combine_files(&self, count: usize) {
+        print!("\n");
         let filename = self.get_filename();
         let mut output = BufWriter::new(File::create(filename).unwrap());
 
@@ -50,6 +52,7 @@ impl ParallelDownloader {
             let mut file = BufReader::new(File::open(format!("ruget_tmp_dir/{}.tmp", i)).unwrap());
             file.read_to_end(&mut buf).expect("read failed...");
             output.write_all(&buf).expect("write failed...");
+            print!("\rWriting : [{} / {}]", i + 1, count);
         }
 
         remove_dir_all("ruget_tmp_dir").expect("remove tmp file failed...");
@@ -62,11 +65,12 @@ impl Download for ParallelDownloader {
 
         println!("--- Parallel download mode ---\n");
         println!("split count : {}", thread_args.len());
-        println!("parallel count : {}", num_cpus::get() * 8);
+        println!("parallel count : {}", num_cpus::get() * 2);
 
         let client = Client::new();
-        let downloaded_count = Arc::new(Mutex::new(0.0));
-        let total_count = thread_args.len() as f32;
+        let downloaded_count = Arc::new(Mutex::new(0));
+
+        let total_count = thread_args.len();
         create_dir("ruget_tmp_dir").expect("create tmp dir failed...");
         thread_args.into_par_iter().for_each(|arg| {
             let mut res = loop {
@@ -82,10 +86,16 @@ impl Download for ParallelDownloader {
             };
             let tmp = format!("ruget_tmp_dir/{}.tmp", arg.0);
             let mut file = File::create(tmp).unwrap();
-            res.copy_to(&mut file).expect("create failed...");
-            *downloaded_count.lock().unwrap() += 1.0;
-            let par = (*downloaded_count.lock().unwrap() / total_count) * 100.0;
-            print!("\rProgress : {:.2}%", par);
+
+            loop {
+                match res.copy_to(&mut file) {
+                    Ok(_) => break,
+                    Err(_) => continue,
+                }
+            }
+
+            *downloaded_count.lock().unwrap() += 1;
+            print!("\rDownloading : [{} / {}]", *downloaded_count.lock().unwrap(), total_count);
         });
 
         self.combine_files(total_count as usize);

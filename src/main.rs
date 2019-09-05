@@ -3,15 +3,16 @@ mod lib;
 use std::env;
 use std::fs::remove_dir_all;
 use std::panic;
+use rayon::ThreadPoolBuilder;
 
 use lib::downloader::parallel::ParallelDownloader;
 use lib::downloader::single::SingleDownloader;
-use lib::utils;
-use lib::utils::Download;
+use lib::utils::{Download, get_content_length};
 
 fn main() {
-    rayon::ThreadPoolBuilder::new()
-        .num_threads(num_cpus::get() * 8)
+    ThreadPoolBuilder::new()
+        .num_threads(num_cpus::get() * 2)
+        .stack_size(1000000)
         .build_global()
         .unwrap();
     panic::set_hook(Box::new(|_| {
@@ -21,7 +22,7 @@ fn main() {
 
     let args: Vec<String> = env::args().collect();
     let url = &args[1];
-    let content_length = utils::get_content_length(url);
+    let content_length = get_content_length(url);
 
     if content_length < 1000000 {
         let downloader = SingleDownloader {
