@@ -1,6 +1,7 @@
 use std::fs::File;
 
-use crate::utils::*;
+use crate::lib::utils::Download;
+use reqwest;
 
 pub struct SingleDownloader {
     pub url: String,
