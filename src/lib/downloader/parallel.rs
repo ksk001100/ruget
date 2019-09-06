@@ -2,6 +2,7 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use reqwest::header::RANGE;
 use reqwest::{Client, StatusCode};
 use std::fs::{create_dir, remove_dir_all, File};
+use std::path::Path;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::sync::{Arc, Mutex};
 use std::io::stdout;
@@ -10,6 +11,7 @@ use num_cpus;
 use crate::lib::utils::{Download, get_content_length, get_file_size};
 
 const TMP_SIZE: usize = 300000;
+const TMP_DIR: &str = "ruget_tmp_dir";
 
 pub struct ParallelDownloader {
     pub url: String,
@@ -52,7 +54,7 @@ impl ParallelDownloader {
 
         for i in 0..count {
             let mut buf: Vec<u8> = Vec::new();
-            let mut file = BufReader::new(File::open(format!("ruget_tmp_dir/{}.tmp", i)).unwrap());
+            let mut file = BufReader::new(File::open(format!("{}/{}.tmp", TMP_DIR, i)).unwrap());
             file.read_to_end(&mut buf).expect("read failed...");
             output.write_all(&buf).expect("write failed...");
             print!(
@@ -63,7 +65,7 @@ impl ParallelDownloader {
             stdout().flush().unwrap();
         }
 
-        remove_dir_all("ruget_tmp_dir").expect("remove tmp file failed...");
+        remove_dir_all(TMP_DIR).expect("remove tmp file failed...");
     }
 }
 
@@ -79,7 +81,11 @@ impl Download for ParallelDownloader {
         let downloaded_count = Arc::new(Mutex::new(0));
 
         let total_count = thread_args.len();
-        create_dir("ruget_tmp_dir").expect("create tmp dir failed...");
+
+        if !Path::new(TMP_DIR).exists() {
+            create_dir(TMP_DIR).expect("create tmp dir failed...");
+        }
+        
         thread_args.into_par_iter().for_each(|arg| {
             let mut res = loop {
                 let res = client
@@ -97,7 +103,7 @@ impl Download for ParallelDownloader {
                     Err(_) => continue,
                 }
             };
-            let tmp = format!("ruget_tmp_dir/{}.tmp", arg.0);
+            let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
             let mut file = File::create(tmp).unwrap();
 
             loop {
