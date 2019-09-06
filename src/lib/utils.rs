@@ -13,6 +13,10 @@ pub fn get_content_length(url: &str) -> i32 {
     (length.to_str().unwrap()).parse::<i32>().unwrap()
 }
 
+pub fn get_file_size(b: f32) -> String {
+    format!("{:.2} MB", b / 1000000.0)
+}
+
 pub trait Download {
     fn download(&self);
 }

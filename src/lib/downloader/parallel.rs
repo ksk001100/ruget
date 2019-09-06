@@ -4,9 +4,12 @@ use reqwest::Client;
 use std::fs::{create_dir, remove_dir_all, File};
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::sync::{Arc, Mutex};
+use std::io::stdout;
 use num_cpus;
 
-use crate::lib::utils::{Download, get_content_length};
+use crate::lib::utils::{Download, get_content_length, get_file_size};
+
+const TMP_SIZE: usize = 300000;
 
 pub struct ParallelDownloader {
     pub url: String,
@@ -15,7 +18,7 @@ pub struct ParallelDownloader {
 impl ParallelDownloader {
     pub fn create_args(&self) -> Vec<(usize, String)> {
         let length = get_content_length(&self.url);
-        let split_num = length / 300000;
+        let split_num = length / TMP_SIZE as i32;
 
         let ranges: Vec<i32> = (0..split_num).map(|n| (length + n) / split_num).collect();
 
@@ -52,7 +55,11 @@ impl ParallelDownloader {
             let mut file = BufReader::new(File::open(format!("ruget_tmp_dir/{}.tmp", i)).unwrap());
             file.read_to_end(&mut buf).expect("read failed...");
             output.write_all(&buf).expect("write failed...");
-            print!("\rWriting : [{} / {}]", i + 1, count);
+            print!(
+                "\rWriting : [{} / {}]",
+                get_file_size(((i + 1) * TMP_SIZE) as f32),
+                get_file_size((count * TMP_SIZE) as f32)
+            );
         }
 
         remove_dir_all("ruget_tmp_dir").expect("remove tmp file failed...");
@@ -95,7 +102,12 @@ impl Download for ParallelDownloader {
             }
 
             *downloaded_count.lock().unwrap() += 1;
-            print!("\rDownloading : [{} / {}]", *downloaded_count.lock().unwrap(), total_count);
+            print!(
+                "\rDownloading : [{} / {}]",
+                get_file_size((*downloaded_count.lock().unwrap() * TMP_SIZE) as f32),
+                get_file_size((total_count * TMP_SIZE) as f32)
+            );
+            stdout().flush();
         });
 
         self.combine_files(total_count as usize);
