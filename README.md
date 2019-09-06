@@ -2,10 +2,12 @@
 
 Alternative to wget written in Rust
 
-## build
+## install
 
 ```bash
-$ cargo build --release
+$ git clone https://github.com/KeisukeToyota/ruget
+$ cd ruget
+$ cargo install --path .
 ```
 
 ## usage
