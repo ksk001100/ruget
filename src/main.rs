@@ -16,7 +16,7 @@ fn main() {
         .unwrap();
     panic::set_hook(Box::new(|_| {
         eprintln!("download failed...");
-        remove_dir_all("ruget_tmp_dir");
+        remove_dir_all("ruget_tmp_dir").unwrap();
     }));
 
     let args: Vec<String> = env::args().collect();

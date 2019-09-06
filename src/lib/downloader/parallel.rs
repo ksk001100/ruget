@@ -1,6 +1,6 @@
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use reqwest::header::RANGE;
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 use std::fs::{create_dir, remove_dir_all, File};
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::sync::{Arc, Mutex};
@@ -60,6 +60,7 @@ impl ParallelDownloader {
                 get_file_size(((i + 1) * TMP_SIZE) as f32),
                 get_file_size((count * TMP_SIZE) as f32)
             );
+            stdout().flush().unwrap();
         }
 
         remove_dir_all("ruget_tmp_dir").expect("remove tmp file failed...");
@@ -87,7 +88,12 @@ impl Download for ParallelDownloader {
                     .send();
 
                 match res {
-                    Ok(res) => break res,
+                    Ok(res) => {
+                        match res.status() {
+                            StatusCode::PARTIAL_CONTENT => break res,
+                            _ => continue,
+                        }
+                    },
                     Err(_) => continue,
                 }
             };
@@ -107,7 +113,7 @@ impl Download for ParallelDownloader {
                 get_file_size((*downloaded_count.lock().unwrap() * TMP_SIZE) as f32),
                 get_file_size((total_count * TMP_SIZE) as f32)
             );
-            stdout().flush();
+            stdout().flush().unwrap();
         });
 
         self.combine_files(total_count as usize);
