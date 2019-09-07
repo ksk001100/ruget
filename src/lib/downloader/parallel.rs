@@ -106,14 +106,6 @@ impl Download for ParallelDownloader {
             let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
             let mut file = File::create(tmp).unwrap();
             res.copy_to(&mut file).unwrap();
-
-//            loop {
-//                match res.copy_to(&mut file) {
-//                    Ok(_) => break,
-//                    Err(_) => continue,
-//                }
-//            }
-
             *downloaded_count.lock().unwrap() += 1;
             print!(
                 "\rDownloading : [{} / {}]",
