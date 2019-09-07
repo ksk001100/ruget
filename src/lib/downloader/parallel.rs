@@ -18,6 +18,10 @@ pub struct ParallelDownloader {
 }
 
 impl ParallelDownloader {
+    pub fn new(url: String) -> Self {
+        Self { url }
+    }
+
     pub fn create_args(&self) -> Vec<(usize, String)> {
         let length = get_content_length(&self.url);
         let split_num = length / TMP_SIZE as i32;
