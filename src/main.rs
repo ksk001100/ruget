@@ -9,7 +9,7 @@ use lib::download_manager::DownloadManager;
 
 fn main() {
     ThreadPoolBuilder::new()
-        .num_threads(num_cpus::get())
+        .num_threads(num_cpus::get() * 2)
         .build_global()
         .unwrap();
     panic::set_hook(Box::new(|_| {
