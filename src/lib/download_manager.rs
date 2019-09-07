@@ -10,7 +10,7 @@ impl DownloadManager {
     pub fn new(url: String) -> Self {
         let downloader: Box<Download> = {
             if get_content_length(&url) < 1000000 {
-                Box::new(SingleDownloader { url })
+                Box::new(SingleDownloader::new(url))
             }
             else {
                 Box::new(ParallelDownloader::new(url))

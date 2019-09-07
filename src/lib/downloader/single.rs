@@ -8,6 +8,10 @@ pub struct SingleDownloader {
 }
 
 impl SingleDownloader {
+    pub fn new(url: String) -> Self {
+        Self { url }
+    }
+
     pub fn get_filename(&self) -> &str {
         let url_parse: Vec<&str> = self.url.split('/').collect();
         match url_parse.last() {
