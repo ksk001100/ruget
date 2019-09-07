@@ -79,7 +79,7 @@ impl Download for ParallelDownloader {
 
         println!("--- Parallel download mode ---\n");
         println!("Split count : {}", thread_args.len());
-        println!("Parallel count : {}", num_cpus::get());
+        println!("Parallel count : {}", num_cpus::get() * 2);
 
         let client = Client::new();
         let downloaded_count = Arc::new(Mutex::new(0));
@@ -89,7 +89,7 @@ impl Download for ParallelDownloader {
         if !Path::new(TMP_DIR).exists() {
             create_dir(TMP_DIR).expect("create tmp dir failed...");
         }
-        
+
         thread_args.into_par_iter().for_each(|arg| {
             let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
             let mut file = File::create(tmp).unwrap();
