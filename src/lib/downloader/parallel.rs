@@ -1,6 +1,6 @@
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use reqwest::header::RANGE;
-use reqwest::{Client, StatusCode};
+use reqwest::Client;
 use std::fs::{create_dir, remove_dir_all, File};
 use std::path::Path;
 use std::io::{BufReader, BufWriter, Read, Write};
@@ -87,25 +87,28 @@ impl Download for ParallelDownloader {
         }
         
         thread_args.into_par_iter().for_each(|arg| {
-            let mut res = loop {
+            let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
+            let mut file = File::create(tmp).unwrap();
+
+            loop {
                 let res = client
                     .get(&self.url)
                     .header(RANGE, format!("{}", arg.1))
                     .send();
 
                 match res {
-                    Ok(res) => {
-                        match res.status() {
-                            StatusCode::PARTIAL_CONTENT => break res,
-                            _ => continue,
+                    Ok(mut res) => {
+                        if res.status().is_success() {
+                            match res.copy_to(&mut file) {
+                                Ok(_) => break,
+                                Err(_) => continue,
+                            }
                         }
                     },
                     Err(_) => continue,
                 }
             };
-            let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
-            let mut file = File::create(tmp).unwrap();
-            res.copy_to(&mut file).unwrap();
+
             *downloaded_count.lock().unwrap() += 1;
             print!(
                 "\rDownloading : [{} / {}]",
