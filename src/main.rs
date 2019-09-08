@@ -1,8 +1,7 @@
 mod lib;
 
-use std::env;
-use std::fs::remove_dir_all;
-use std::panic;
+use std::{env, fs::remove_dir_all, panic};
+
 use rayon::ThreadPoolBuilder;
 
 use lib::download_manager::DownloadManager;

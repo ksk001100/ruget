@@ -1,14 +1,18 @@
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use reqwest::header::{RANGE, CONTENT_LENGTH};
-use reqwest::Client;
-use std::fs::{create_dir, remove_dir_all, File};
-use std::path::Path;
-use std::io::{BufReader, BufWriter, Read, Write};
-use std::sync::{Arc, Mutex};
-use std::io::stdout;
-use num_cpus;
+use std::{
+    fs::{create_dir, remove_dir_all, File},
+    io::{stdout, BufReader, BufWriter, Read, Write},
+    path::Path,
+    sync::{Arc, Mutex},
+};
 
-use crate::lib::utils::{Download, get_file_size};
+use num_cpus;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use reqwest::{
+    header::{CONTENT_LENGTH, RANGE},
+    Client,
+};
+
+use crate::lib::utils::{get_file_size, Download};
 
 const TMP_SIZE: usize = 300000;
 const TMP_DIR: &str = "ruget_tmp_dir";
@@ -27,7 +31,9 @@ impl ParallelDownloader {
     pub fn create_args(&self) -> Vec<(usize, String)> {
         let content_length = self.get_content_length();
         let split_num = content_length / TMP_SIZE as i32;
-        let ranges: Vec<i32> = (0..split_num).map(|n| (content_length + n) / split_num).collect();
+        let ranges: Vec<i32> = (0..split_num)
+            .map(|n| (content_length + n) / split_num)
+            .collect();
 
         (&ranges)
             .into_iter()
@@ -105,7 +111,8 @@ impl Download for ParallelDownloader {
             let mut file = File::create(tmp).unwrap();
 
             loop {
-                let res = self.client
+                let res = self
+                    .client
                     .get(&self.url)
                     .header(RANGE, format!("{}", arg.1))
                     .send();
@@ -118,10 +125,10 @@ impl Download for ParallelDownloader {
                                 Err(_) => continue,
                             }
                         }
-                    },
+                    }
                     Err(_) => continue,
                 }
-            };
+            }
 
             *downloaded_count.lock().unwrap() += 1;
             print!(
