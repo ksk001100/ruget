@@ -1,9 +1,10 @@
-use crate::lib::utils::{Download, is_accept_ranges};
-use crate::lib::downloader::parallel::ParallelDownloader;
-use crate::lib::downloader::single::SingleDownloader;
+use crate::lib::{
+    downloader::{parallel::ParallelDownloader, single::SingleDownloader},
+    utils::{is_accept_ranges, Download},
+};
 
 pub struct DownloadManager {
-    pub downloader: Box<Download>
+    pub downloader: Box<Download>,
 }
 
 impl DownloadManager {
@@ -11,8 +12,7 @@ impl DownloadManager {
         let downloader: Box<Download> = {
             if is_accept_ranges(&url) {
                 Box::new(ParallelDownloader::new(url))
-            }
-            else {
+            } else {
                 Box::new(SingleDownloader::new(url))
             }
         };
