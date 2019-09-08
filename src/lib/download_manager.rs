@@ -1,4 +1,4 @@
-use crate::lib::utils::{Download, get_content_length};
+use crate::lib::utils::{Download, is_accept_ranges};
 use crate::lib::downloader::parallel::ParallelDownloader;
 use crate::lib::downloader::single::SingleDownloader;
 
@@ -9,11 +9,11 @@ pub struct DownloadManager {
 impl DownloadManager {
     pub fn new(url: String) -> Self {
         let downloader: Box<Download> = {
-            if get_content_length(&url) < 1000000 {
-                Box::new(SingleDownloader::new(url))
+            if is_accept_ranges(&url) {
+                Box::new(ParallelDownloader::new(url))
             }
             else {
-                Box::new(ParallelDownloader::new(url))
+                Box::new(SingleDownloader::new(url))
             }
         };
         Self { downloader }

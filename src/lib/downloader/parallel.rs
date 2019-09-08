@@ -1,5 +1,5 @@
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use reqwest::header::RANGE;
+use reqwest::header::{RANGE, CONTENT_LENGTH};
 use reqwest::Client;
 use std::fs::{create_dir, remove_dir_all, File};
 use std::path::Path;
@@ -8,25 +8,26 @@ use std::sync::{Arc, Mutex};
 use std::io::stdout;
 use num_cpus;
 
-use crate::lib::utils::{Download, get_content_length, get_file_size};
+use crate::lib::utils::{Download, get_file_size};
 
 const TMP_SIZE: usize = 300000;
 const TMP_DIR: &str = "ruget_tmp_dir";
 
 pub struct ParallelDownloader {
     pub url: String,
+    pub client: Client,
 }
 
 impl ParallelDownloader {
     pub fn new(url: String) -> Self {
-        Self { url }
+        let client = Client::new();
+        Self { url, client }
     }
 
     pub fn create_args(&self) -> Vec<(usize, String)> {
-        let length = get_content_length(&self.url);
-        let split_num = length / TMP_SIZE as i32;
-
-        let ranges: Vec<i32> = (0..split_num).map(|n| (length + n) / split_num).collect();
+        let content_length = self.get_content_length();
+        let split_num = content_length / TMP_SIZE as i32;
+        let ranges: Vec<i32> = (0..split_num).map(|n| (content_length + n) / split_num).collect();
 
         (&ranges)
             .into_iter()
@@ -34,9 +35,9 @@ impl ParallelDownloader {
             .map(|(index, x)| {
                 let s = match index {
                     0 => 0,
-                    _ => (&ranges[..index]).iter().fold(0, |sum, y| sum + y) + 1,
+                    _ => (&ranges[..index]).iter().fold(0, |sum, y| sum + *y) + 1,
                 };
-                let e = (&ranges[..index]).iter().fold(0, |sum, y| sum + y) + x;
+                let e = (&ranges[..index]).iter().fold(0, |sum, y| sum + *y) + *x;
                 let range = format!("bytes={}-{}", s, e);
                 (index, range)
             })
@@ -71,6 +72,17 @@ impl ParallelDownloader {
 
         remove_dir_all(TMP_DIR).expect("remove tmp file failed...");
     }
+
+    pub fn get_content_length(&self) -> i32 {
+        let resp = self.client.head(&self.url).send().expect("head failed...");
+
+        let length = resp
+            .headers()
+            .get(CONTENT_LENGTH)
+            .expect("cannot get content-length...");
+
+        (length.to_str().unwrap()).parse::<i32>().unwrap()
+    }
 }
 
 impl Download for ParallelDownloader {
@@ -81,9 +93,7 @@ impl Download for ParallelDownloader {
         println!("Split count : {}", thread_args.len());
         println!("Parallel count : {}", num_cpus::get() * 2);
 
-        let client = Client::new();
         let downloaded_count = Arc::new(Mutex::new(0));
-
         let total_count = thread_args.len();
 
         if !Path::new(TMP_DIR).exists() {
@@ -95,7 +105,7 @@ impl Download for ParallelDownloader {
             let mut file = File::create(tmp).unwrap();
 
             loop {
-                let res = client
+                let res = self.client
                     .get(&self.url)
                     .header(RANGE, format!("{}", arg.1))
                     .send();
