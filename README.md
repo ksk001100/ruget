@@ -2,6 +2,8 @@
 
 Alternative to wget written in Rust
 
+![screen shot](https://github.com/KeisukeToyota/ruget/blob/images/screen_shot.png)
+
 ## install
 
 ```bash
