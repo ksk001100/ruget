@@ -1,5 +1,7 @@
 # Ruget
 
+[![Build Status](https://travis-ci.org/KeisukeToyota/ruget.svg?branch=master)](https://travis-ci.org/KeisukeToyota/ruget)
+
 Alternative to wget written in Rust
 
 ![screen shot](https://github.com/KeisukeToyota/ruget/blob/images/screen_shot.png)
