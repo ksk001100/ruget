@@ -13,6 +13,11 @@ $ git clone https://github.com/KeisukeToyota/ruget
 $ cd ruget
 $ cargo install --path .
 ```
+In macOS you can install it with Homebrew
+```bash
+$ brew tap keisuketoyota/homebrew-ruget
+$ brew install ruget
+```
 
 ## usage
 
