@@ -1,5 +1,10 @@
 # Ruget
 
+![](https://img.shields.io/github/stars/KeisukeToyota/ruget.svg)
+![](https://img.shields.io/github/release/KeisukeToyota/ruget.svg)
+![](https://img.shields.io/github/issues/KeisukeToyota/ruget.svg)
+![](https://img.shields.io/github/forks/KeisukeToyota/ruget.svg)
+![](https://img.shields.io/github/license/KeisukeToyota/ruget.svg)
 [![Build Status](https://travis-ci.org/KeisukeToyota/ruget.svg?branch=master)](https://travis-ci.org/KeisukeToyota/ruget)
 
 Alternative to wget written in Rust
