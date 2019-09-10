@@ -14,6 +14,10 @@ Alternative to wget written in Rust
 ## install
 
 ```bash
+$ cargo install ruget
+```
+
+```bash
 $ git clone https://github.com/KeisukeToyota/ruget
 $ cd ruget
 $ cargo install --path .
