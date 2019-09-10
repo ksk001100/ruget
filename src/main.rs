@@ -1,6 +1,6 @@
 mod lib;
 
-use std::{env, fs::remove_dir_all, panic};
+use std::{env, fs::remove_dir_all, panic, process::exit};
 
 use rayon::ThreadPoolBuilder;
 
@@ -17,7 +17,14 @@ fn main() {
     }));
 
     let args: Vec<String> = env::args().collect();
-    let url = &args[1];
+    let url = match args.len() {
+        2 => &args[1],
+        _ => {
+            eprintln!("Please specify a URL...");
+            exit(1);
+        }
+    };
+
     let download_manager = DownloadManager::new(url.to_owned());
     download_manager.downloader.download();
 }
