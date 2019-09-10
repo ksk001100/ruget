@@ -17,11 +17,6 @@ Alternative to wget written in Rust
 $ cargo install ruget
 ```
 
-```bash
-$ git clone https://github.com/KeisukeToyota/ruget
-$ cd ruget
-$ cargo install --path .
-```
 In macOS you can install it with Homebrew
 ```bash
 $ brew tap keisuketoyota/homebrew-ruget
