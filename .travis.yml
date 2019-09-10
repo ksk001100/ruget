@@ -10,15 +10,14 @@ matrix:
       env: TARGET=x86_64-apple-darwin
     - os: linux
       env: TARGET=x86_64-unknown-linux-gnu
+    - os: windows
+      env: TARGET=x86_64-pc-windows-gnu
 before_script:
   - rustc -V
   - cargo -V
   - git --version
   - echo $TRAVIS_BRANCH
   - git rev-parse HEAD
-script:
-  - export PKG_CONFIG_ALLOW_CROSS=1
-  - cargo build --target $TARGET && file target/${TARGET}/debug/ruget
 notifications:
   email:
     on_success: never
