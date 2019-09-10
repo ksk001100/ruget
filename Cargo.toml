@@ -3,6 +3,11 @@ name = "ruget"
 version = "0.1.0"
 authors = ["KeisukeToyota <hm.pudding0715@gmail.com>"]
 edition = "2018"
+repository = "https://github.com/KeisukeToyota/ruget"
+keywords = ["wget", "downloader", "parallel"]
+license-file = "LICENSE"
+readme = "README.md"
+description = "Alternative to wget written in Rust"
 
 [dependencies]
 reqwest = "*"
