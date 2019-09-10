@@ -10,6 +10,6 @@ readme = "README.md"
 description = "Alternative to wget written in Rust"
 
 [dependencies]
-reqwest = "*"
-rayon = "*"
+reqwest = "0.9"
+rayon = "1.1"
 num_cpus = "1.0"
