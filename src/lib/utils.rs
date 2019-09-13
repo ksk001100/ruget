@@ -6,17 +6,15 @@ pub fn get_file_size(b: f32) -> String {
 
 pub fn is_accept_ranges(url: &str) -> bool {
     let client = Client::new();
-
     let res = client.head(url).send().expect("head failed...");
-
-    let accept_ranges = res
-        .headers()
-        .get(ACCEPT_RANGES)
-        .expect("cannot get accept ranges...");
-
-    match accept_ranges.to_str().unwrap() {
-        "none" => false,
-        _ => true,
+    match res.headers().get(ACCEPT_RANGES) {
+        Some(res) => {
+            match res.to_str().unwrap() {
+                "none" => false,
+                _ => true,
+            }
+        },
+        None => false
     }
 }
 

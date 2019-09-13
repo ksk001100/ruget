@@ -1,6 +1,6 @@
 mod lib;
 
-use std::{env, fs::remove_dir_all, panic, process::exit};
+use std::{env, process::exit};
 
 use rayon::ThreadPoolBuilder;
 
@@ -11,10 +11,6 @@ fn main() {
         .num_threads(num_cpus::get() * 2)
         .build_global()
         .unwrap();
-    panic::set_hook(Box::new(|_| {
-        eprintln!("download failed...");
-        remove_dir_all("ruget_tmp_dir").unwrap();
-    }));
 
     let args: Vec<String> = env::args().collect();
     let url = match args.len() {
