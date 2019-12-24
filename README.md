@@ -1,15 +1,15 @@
 # Ruget
 
-![](https://img.shields.io/github/stars/KeisukeToyota/ruget.svg)
-![](https://img.shields.io/github/release/KeisukeToyota/ruget.svg)
-![](https://img.shields.io/github/issues/KeisukeToyota/ruget.svg)
-![](https://img.shields.io/github/forks/KeisukeToyota/ruget.svg)
-![](https://img.shields.io/github/license/KeisukeToyota/ruget.svg)
-[![Build Status](https://travis-ci.org/KeisukeToyota/ruget.svg?branch=master)](https://travis-ci.org/KeisukeToyota/ruget)
+![](https://img.shields.io/github/stars/ksk001100/ruget.svg)
+![](https://img.shields.io/github/release/ksk001100/ruget.svg)
+![](https://img.shields.io/github/issues/ksk001100/ruget.svg)
+![](https://img.shields.io/github/forks/ksk001100/ruget.svg)
+![](https://img.shields.io/github/license/ksk001100/ruget.svg)
+[![Build Status](https://travis-ci.org/ksk001100/ruget.svg?branch=master)](https://travis-ci.org/ksk001100/ruget)
 
 Alternative to wget written in Rust
 
-![screen shot](https://github.com/KeisukeToyota/ruget/blob/images/screen_shot.png)
+![screen shot](https://github.com/ksk001100/ruget/blob/images/screen_shot.png)
 
 ## install
 
@@ -19,7 +19,7 @@ $ cargo install ruget
 
 In macOS you can install it with Homebrew
 ```bash
-$ brew tap keisuketoyota/homebrew-ruget
+$ brew tap ksk001100/homebrew-ruget
 $ brew install ruget
 ```
 

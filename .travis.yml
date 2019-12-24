@@ -33,6 +33,6 @@ deploy:
   file: ruget-${TRAVIS_TAG}-${TARGET}.zip
   skip_cleanup: true
   on:
-    repo: KeisukeToyota/ruget
+    repo: ksk001100/ruget
     tags: true
 cache: cargo

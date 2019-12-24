@@ -1,9 +1,9 @@
 [package]
 name = "ruget"
 version = "0.1.2"
-authors = ["KeisukeToyota <hm.pudding0715@gmail.com>"]
+authors = ["ksk001100 <hm.pudding0715@gmail.com>"]
 edition = "2018"
-repository = "https://github.com/KeisukeToyota/ruget"
+repository = "https://github.com/ksk001100/ruget"
 keywords = ["wget", "downloader", "parallel"]
 license-file = "LICENSE"
 readme = "README.md"
