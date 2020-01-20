@@ -8,13 +8,11 @@ pub fn is_accept_ranges(url: &str) -> bool {
     let client = Client::new();
     let res = client.head(url).send().expect("head failed...");
     match res.headers().get(ACCEPT_RANGES) {
-        Some(res) => {
-            match res.to_str().unwrap() {
-                "none" => false,
-                _ => true,
-            }
+        Some(res) => match res.to_str().unwrap() {
+            "none" => false,
+            _ => true,
         },
-        None => false
+        None => false,
     }
 }
 
