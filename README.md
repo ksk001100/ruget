@@ -9,7 +9,9 @@
 
 Alternative to wget written in Rust
 
-![screen shot](https://github.com/ksk001100/ruget/blob/images/screen_shot.png)
+<div align="center">
+    <img src="images/screen_shot.png" title="screen shot">
+</div>
 
 ## install
 
@@ -28,6 +30,9 @@ $ brew install ruget
 ```bash
 $ ruget https://sample-videos.com/img/Sample-png-image-30mb.png
 ```
+
+![screen shot2](images/screen_shot2.png)
+
 
 ## Ruget vs Wget
 
