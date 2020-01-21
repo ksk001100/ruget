@@ -1,6 +1,6 @@
 [package]
 name = "ruget"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["ksk001100 <hm.pudding0715@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/ksk001100/ruget"

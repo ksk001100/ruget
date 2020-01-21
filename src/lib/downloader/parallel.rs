@@ -30,8 +30,8 @@ impl ParallelDownloader {
 
     pub fn create_args(&self) -> Vec<(usize, String)> {
         let content_length = self.get_content_length();
-        let split_num = content_length / TMP_SIZE as i32;
-        let ranges: Vec<i32> = (0..split_num)
+        let split_num = content_length / TMP_SIZE;
+        let ranges: Vec<usize> = (0..split_num)
             .map(|n| (content_length + n) / split_num)
             .collect();
 
@@ -79,7 +79,7 @@ impl ParallelDownloader {
         remove_dir_all(TMP_DIR).expect("remove tmp file failed...");
     }
 
-    pub fn get_content_length(&self) -> i32 {
+    pub fn get_content_length(&self) -> usize {
         let resp = self.client.head(&self.url).send().expect("head failed...");
 
         let length = resp
@@ -87,7 +87,7 @@ impl ParallelDownloader {
             .get(CONTENT_LENGTH)
             .expect("cannot get content-length...");
 
-        (length.to_str().unwrap()).parse::<i32>().unwrap()
+        (length.to_str().unwrap()).parse::<usize>().unwrap()
     }
 }
 
