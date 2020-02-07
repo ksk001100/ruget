@@ -97,7 +97,7 @@ impl Download for ParallelDownloader {
 
         println!("--- Parallel download mode ---\n");
         println!("Split count : {}", thread_args.len());
-        println!("Parallel count : {}", num_cpus::get() * 2);
+        println!("Parallel count : {}", num_cpus::get());
 
         let downloaded_count = Arc::new(Mutex::new(0));
         let total_count = thread_args.len();

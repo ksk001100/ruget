@@ -15,12 +15,11 @@ const DISPLAY_NAME: &'static str = "
 | |  | |_| | (_| |  __/ |_ 
 |_|   \\__,_|\\__, |\\___|\\__|
              __/ |         
-            |___/                            
-";
+            |___/";
 
 fn main() {
     ThreadPoolBuilder::new()
-        .num_threads(num_cpus::get() * 2)
+        .num_threads(num_cpus::get())
         .build_global()
         .unwrap();
 
