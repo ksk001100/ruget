@@ -3,11 +3,11 @@ mod lib;
 use std::{env, process::exit};
 
 use rayon::ThreadPoolBuilder;
-use seahorse::{Action, SingleApp, color};
+use seahorse::{color, Action, App, Flag, FlagType};
 
 use lib::download_manager::DownloadManager;
 
-const DISPLAY_NAME: &'static str = "
+const NAME: &'static str = "
                        _   
                       | |  
  _ __ _   _  __ _  ___| |_ 
@@ -24,25 +24,36 @@ fn main() {
         .unwrap();
 
     let args: Vec<String> = env::args().collect();
-    let action: Action = |v: Vec<String>| {
-        let url = match v.len() {
-            1 => &v[0],
+    let action: Action = |c| {
+        let url = match c.args.len() {
+            1 => &c.args[0],
             _ => {
                 eprintln!("Please specify a URL...");
                 exit(1);
             }
         };
 
-        let download_manager = DownloadManager::new(url.to_owned());
+        let output = &c.string_flag("output");
+
+        let download_manager = DownloadManager::new(url.to_owned(), output.to_owned());
         download_manager.downloader.download();
     };
 
-    let app = SingleApp::new()
-        .name("ruget")
-        .display_name(color::red(DISPLAY_NAME))
+    let app = App::new()
+        .name(color::red(NAME))
         .usage("ruget [url]")
+        .author(env!("CARGO_PKG_AUTHORS"))
+        .description(env!("CARGO_PKG_DESCRIPTION"))
         .version(env!("CARGO_PKG_VERSION"))
-        .action(action);
+        .action(action)
+        .flag(
+            Flag::new(
+                "output",
+                "[--output, -o]: ruget [url] --output [file name]",
+                FlagType::String,
+            )
+            .alias("o"),
+        );
 
     app.run(args);
 }

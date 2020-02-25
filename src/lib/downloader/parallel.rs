@@ -19,13 +19,18 @@ const TMP_DIR: &str = "ruget_tmp_dir";
 
 pub struct ParallelDownloader {
     pub url: String,
+    pub output_path: Option<String>,
     pub client: Client,
 }
 
 impl ParallelDownloader {
-    pub fn new(url: String) -> Self {
+    pub fn new(url: String, output_path: Option<String>) -> Self {
         let client = Client::new();
-        Self { url, client }
+        Self {
+            url,
+            output_path,
+            client,
+        }
     }
 
     pub fn create_args(&self) -> Vec<(usize, String)> {
@@ -51,10 +56,15 @@ impl ParallelDownloader {
     }
 
     pub fn get_filename(&self) -> &str {
-        let url_parse: Vec<&str> = self.url.split('/').collect();
-        match url_parse.last() {
-            Some(name) => name,
-            None => panic!("cannot get file name..."),
+        match &self.output_path {
+            Some(output_path) => &output_path,
+            None => {
+                let url_parse: Vec<&str> = self.url.split('/').collect();
+                match url_parse.last() {
+                    Some(name) => name,
+                    None => panic!("cannot get file name..."),
+                }
+            }
         }
     }
 
@@ -107,9 +117,6 @@ impl Download for ParallelDownloader {
         }
 
         thread_args.into_par_iter().for_each(|arg| {
-            let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
-            let mut file = File::create(tmp).unwrap();
-
             loop {
                 let res = self
                     .client
@@ -120,6 +127,8 @@ impl Download for ParallelDownloader {
                 match res {
                     Ok(mut res) => {
                         if res.status().is_success() {
+                            let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
+                            let mut file = File::create(tmp).unwrap();
                             match res.copy_to(&mut file) {
                                 Ok(_) => break,
                                 Err(_) => continue,

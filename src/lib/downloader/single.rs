@@ -6,18 +6,24 @@ use crate::lib::utils::Download;
 
 pub struct SingleDownloader {
     pub url: String,
+    pub output_path: Option<String>,
 }
 
 impl SingleDownloader {
-    pub fn new(url: String) -> Self {
-        Self { url }
+    pub fn new(url: String, output_path: Option<String>) -> Self {
+        Self { url, output_path }
     }
 
     pub fn get_filename(&self) -> &str {
-        let url_parse: Vec<&str> = self.url.split('/').collect();
-        match url_parse.last() {
-            Some(name) => name,
-            None => panic!("cannot get file name..."),
+        match &self.output_path {
+            Some(output_path) => &output_path,
+            None => {
+                let url_parse: Vec<&str> = self.url.split('/').collect();
+                match url_parse.last() {
+                    Some(name) => name,
+                    None => panic!("cannot get file name..."),
+                }
+            }
         }
     }
 }
