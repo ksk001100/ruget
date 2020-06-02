@@ -1,25 +1,27 @@
 use crate::lib::utils::{content_length, get_file_size, get_filename};
 use async_std::sync::Mutex;
 use async_std::task;
+use async_std::fs::File;
+use async_std::io::{BufWriter};
+use async_std::prelude::*;
 use chrono::{DateTime, Local};
 use seahorse::{color, Context};
-use std::fs::{create_dir, metadata, remove_dir_all, File};
-use std::io::{stdout, BufReader, BufWriter, Read, Write};
+use std::fs::{create_dir, metadata, remove_dir_all};
+use std::io::{stdout, Read, Write};
 use std::path::Path;
 use std::sync::Arc;
-use surf::{self, http, url, Request};
+use surf::{self, url};
 
-const TMP_SIZE: usize = 300000;
 const TMP_DIR: &str = "ruget_tmp_dir";
 
 pub fn combine_files(filename: &str, count: usize) {
     print!("\n");
-    let mut output = BufWriter::new(File::create(filename).unwrap());
+    let mut output = std::io::BufWriter::new(std::fs::File::create(filename).unwrap());
 
     for i in 0..count {
         let mut buf: Vec<u8> = Vec::new();
         let path = format!("{}/{}.tmp", TMP_DIR, i);
-        let mut file = BufReader::new(File::open(&path).unwrap());
+        let mut file = std::io::BufReader::new(std::fs::File::open(&path).unwrap());
         file.read_to_end(&mut buf).expect("read failed...");
         output.write_all(&buf).expect("write failed...");
         print!(
@@ -35,7 +37,7 @@ pub fn combine_files(filename: &str, count: usize) {
 
 pub async fn spawn_args(url: &str) -> Result<Vec<(usize, String, usize)>, surf::Exception> {
     let content_length = content_length(url).await?;
-    let split_num = content_length / TMP_SIZE;
+    let split_num = std::cmp::min(150, content_length / 300000);
     let ranges: Vec<usize> = (0..split_num)
         .map(|n| (content_length + n) / split_num)
         .collect();
@@ -76,13 +78,16 @@ pub fn action(c: &Context) {
 
         for arg in args {
             let downloaded_count = downloaded_count.clone();
-            let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
-            let mut file = File::create(tmp).unwrap();
+
             let url = url::Url::parse(&uri).expect("");
             tasks.push(task::spawn(async move {
-                let req = Request::new(http::Method::GET, url);
-                let res = req.set_header("Range", arg.1).recv_bytes().await.expect("");
-                file.write(&res).expect("");
+                let res = surf::get(url).set_header("Range", arg.1).recv_bytes().await.expect("");
+                {
+                    let tmp = format!("{}/{}.tmp", TMP_DIR, arg.0);
+                    let buf = File::create(tmp).await.expect("");
+                    let mut file = BufWriter::new(buf);
+                    file.write_all(&res).await.expect("");
+                }
                 *downloaded_count.lock().await += 1;
                 print!(
                     "\rDownloading : [{} / {}]",
