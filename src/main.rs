@@ -33,14 +33,16 @@ fn main() {
             }
         };
 
-        let output = &c.string_flag("output");
+        let output = match c.string_flag("output") {
+            Ok(output) => Some(output),
+            Err(_) => None
+        };
 
         let download_manager = DownloadManager::new(url.to_owned(), output.to_owned());
         download_manager.downloader.download();
     };
 
-    let app = App::new()
-        .name(color::red(NAME))
+    let app = App::new(color::red(NAME))
         .usage("ruget [url]")
         .author(env!("CARGO_PKG_AUTHORS"))
         .description(env!("CARGO_PKG_DESCRIPTION"))
@@ -49,9 +51,9 @@ fn main() {
         .flag(
             Flag::new(
                 "output",
-                "[--output, -o]: ruget [url] --output [file name]",
                 FlagType::String,
             )
+            .usage("--output, -o: ruget [url] --output [file name]")
             .alias("o"),
         );
 
