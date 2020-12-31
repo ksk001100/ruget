@@ -35,7 +35,7 @@ fn main() {
 
         let output = match c.string_flag("output") {
             Ok(o) => Some(o),
-            Err(_) => None
+            Err(_) => None,
         };
 
         let download_manager = DownloadManager::new(url.to_owned(), output.to_owned());
@@ -49,12 +49,9 @@ fn main() {
         .version(env!("CARGO_PKG_VERSION"))
         .action(action)
         .flag(
-            Flag::new(
-                "output",
-                FlagType::String,
-            )
-            .usage("--output, -o: ruget [url] --output [file name]")
-            .alias("o"),
+            Flag::new("output", FlagType::String)
+                .description("Specify the name of the output file.")
+                .alias("o"),
         );
 
     app.run(args);
