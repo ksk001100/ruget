@@ -1,6 +1,6 @@
 [package]
 name = "ruget"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["ksk001100 <hm.pudding0715@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/ksk001100/ruget"
@@ -13,4 +13,4 @@ description = "Alternative to wget written in Rust"
 reqwest = "0.9"
 rayon = "1.1"
 num_cpus = "1.0"
-seahorse = "1.0.0"
+seahorse = "1.1.1"
