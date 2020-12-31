@@ -1040,7 +1040,7 @@ dependencies = [
 
 [[package]]
 name = "ruget"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "num_cpus",
  "rayon",
