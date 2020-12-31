@@ -2,10 +2,12 @@ use std::{
     fs::{create_dir, remove_dir_all, File},
     io::{stdout, BufReader, BufWriter, Read, Write},
     path::Path,
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
 };
 
-use num_cpus;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use reqwest::{
     header::{CONTENT_LENGTH, RANGE},
@@ -41,7 +43,7 @@ impl ParallelDownloader {
             .collect();
 
         (&ranges)
-            .into_iter()
+            .iter()
             .enumerate()
             .map(|(index, x)| {
                 let s = match index {
@@ -69,7 +71,7 @@ impl ParallelDownloader {
     }
 
     pub fn combine_files(&self, count: usize) {
-        print!("\n");
+        println!();
         let filename = self.get_filename();
         let mut output = BufWriter::new(File::create(filename).unwrap());
 
@@ -109,7 +111,7 @@ impl Download for ParallelDownloader {
         println!("Split count : {}", thread_args.len());
         println!("Parallel count : {}", num_cpus::get());
 
-        let downloaded_count = Arc::new(Mutex::new(0));
+        let downloaded_count = Arc::new(AtomicUsize::new(0));
         let total_count = thread_args.len();
 
         if !Path::new(TMP_DIR).exists() {
@@ -117,11 +119,12 @@ impl Download for ParallelDownloader {
         }
 
         thread_args.into_par_iter().for_each(|arg| {
+            let downloaded_count = downloaded_count.clone();
             loop {
                 let res = self
                     .client
                     .get(&self.url)
-                    .header(RANGE, format!("{}", arg.1))
+                    .header(RANGE, arg.1.to_string())
                     .send();
 
                 match res {
@@ -139,10 +142,10 @@ impl Download for ParallelDownloader {
                 }
             }
 
-            *downloaded_count.lock().unwrap() += 1;
+            downloaded_count.fetch_add(1, Ordering::Relaxed);
             print!(
                 "\rDownloading : [{} / {}]",
-                get_file_size((*downloaded_count.lock().unwrap() * TMP_SIZE) as f32),
+                get_file_size((downloaded_count.load(Ordering::SeqCst) * TMP_SIZE) as f32),
                 get_file_size((total_count * TMP_SIZE) as f32)
             );
             stdout().flush().unwrap();

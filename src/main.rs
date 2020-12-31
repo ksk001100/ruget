@@ -7,7 +7,7 @@ use seahorse::{color, Action, App, Flag, FlagType};
 
 use lib::download_manager::DownloadManager;
 
-const NAME: &'static str = "
+const NAME: &str = "
                        _   
                       | |  
  _ __ _   _  __ _  ___| |_ 
@@ -38,7 +38,7 @@ fn main() {
             Err(_) => None,
         };
 
-        let download_manager = DownloadManager::new(url.to_owned(), output.to_owned());
+        let download_manager = DownloadManager::new(url.to_owned(), output);
         download_manager.downloader.download();
     };
 
