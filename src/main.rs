@@ -3,7 +3,7 @@ mod lib;
 use std::{env, process::exit};
 
 use rayon::ThreadPoolBuilder;
-use seahorse::{color, Action, App, Flag, FlagType};
+use seahorse::{Action, App, Flag, FlagType};
 
 use lib::download_manager::DownloadManager;
 
@@ -42,7 +42,7 @@ fn main() {
         download_manager.downloader.download();
     };
 
-    let app = App::new(color::red(NAME))
+    let app = App::new(NAME)
         .usage("ruget [url]")
         .author(env!("CARGO_PKG_AUTHORS"))
         .description(env!("CARGO_PKG_DESCRIPTION"))
