@@ -1,6 +1,6 @@
 use crate::lib::{
     downloader::{parallel::ParallelDownloader, single::SingleDownloader},
-    utils::{is_accept_ranges, Download},
+    utils::{is_accept_ranges, Download, RugetError},
 };
 
 pub struct DownloadManager {
@@ -8,14 +8,15 @@ pub struct DownloadManager {
 }
 
 impl DownloadManager {
-    pub fn new(url: String, output_path: Option<String>) -> Self {
+    pub fn new(url: String, output_path: Option<String>) -> Result<Self,RugetError> {
+
         let downloader: Box<dyn Download> = {
-            if is_accept_ranges(&url) {
+            if is_accept_ranges(&url)? {
                 Box::new(ParallelDownloader::new(url, output_path))
             } else {
                 Box::new(SingleDownloader::new(url, output_path))
             }
         };
-        Self { downloader }
+        Ok( Self { downloader } )
     }
 }

@@ -7,6 +7,8 @@ use seahorse::{Action, App, Flag, FlagType};
 
 use lib::download_manager::DownloadManager;
 
+use lib::utils::RugetError;
+
 const NAME: &str = "
                        _   
                       | |  
@@ -38,8 +40,15 @@ fn main() {
             Err(_) => None,
         };
 
-        let download_manager = DownloadManager::new(url.to_owned(), output);
-        download_manager.downloader.download();
+        match DownloadManager::new(url.to_owned(), output) {
+            Ok(download_manager) => download_manager.downloader.download(),
+            Err(ruget_error) => {
+                match ruget_error {
+                    RugetError::ClientBuiltError => eprintln!("Error when building client : verify your url"),
+                    RugetError::ClientExecuteError => eprintln!("Error when executing client"),
+                }
+            },
+        }
     };
 
     let app = App::new(NAME)
