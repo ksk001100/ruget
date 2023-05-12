@@ -1,4 +1,4 @@
-use reqwest::{header::ACCEPT_RANGES, Client};
+use reqwest::{blocking::Client, header::ACCEPT_RANGES};
 
 pub fn get_file_size(b: f32) -> String {
     format!("{:.2} MB", b / 1000000.0)

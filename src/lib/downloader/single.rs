@@ -30,7 +30,7 @@ impl Download for SingleDownloader {
     fn download(&self) {
         println!("--- Single download mode ---\n");
 
-        let mut res = reqwest::get(&self.url).expect("download failed...");
+        let mut res = reqwest::blocking::get(&self.url).expect("download failed...");
         let filename = self.get_filename();
         let mut file = File::create(filename).unwrap();
         res.copy_to(&mut file).expect("create failed...");

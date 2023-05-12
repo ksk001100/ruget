@@ -10,8 +10,8 @@ use std::{
 
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use reqwest::{
+    blocking::Client,
     header::{CONTENT_LENGTH, RANGE},
-    Client,
 };
 
 use crate::lib::utils::{get_file_size, Download};
