@@ -1,4 +1,4 @@
-use reqwest::{header::ACCEPT_RANGES, Client};
+use reqwest::{blocking::Client, header::ACCEPT_RANGES};
 
 pub enum RugetError {
     ClientBuiltError,
